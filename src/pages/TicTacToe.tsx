@@ -14,7 +14,7 @@ import {
   IonRouterOutlet,
 } from "@ionic/react";
 import {
-  addOutline,
+
   atOutline,
   desktopOutline,
   diceOutline,
@@ -27,8 +27,7 @@ const TicTacToe = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonMenuButton menu="first" />
-
+          <IonMenuButton slot="start"/>
           <IonTitle size="large">Tic-Tac-Toe</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -54,7 +53,7 @@ const TicTacToe = () => {
           </IonItem>
           <IonItem>
             <IonIcon icon={atOutline} slot="start" />
-            <IonLabel>Abouut</IonLabel>
+            <IonLabel>About</IonLabel>
           </IonItem>
         </IonList>
         <IonRouterOutlet id="menuContent"></IonRouterOutlet>
