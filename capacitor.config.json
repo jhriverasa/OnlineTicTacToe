@@ -1,6 +1,6 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "tictactoe",
-	"webDir": "build",
-	"bundledWebRuntime": false
+  "appId": "jhriverasa.tictactoe.co",
+  "appName": "tictactoe",
+  "webDir": "build",
+  "bundledWebRuntime": false
 }
