@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 import {
   IonPage,
   IonContent,
@@ -5,14 +7,38 @@ import {
   IonToolbar,
   IonMenuButton,
   IonTitle,
+  IonLabel,
+  IonRippleEffect,
   IonGrid,
   IonRow,
   IonCol,
 } from "@ionic/react";
 
+import { BoardConst } from "../utils";
+import Board from "../components/Board";
 import Mainmenu from "../components/header/MainMenu";
 
 const TicTacToe = () => {
+  const blank = BoardConst.blank;
+  const blankBoardState = [
+    blank,
+    blank,
+    blank,
+    blank,
+    blank,
+    blank,
+    blank,
+    blank,
+    blank,
+  ];
+  const [boardState, setBoardState] = useState(blankBoardState);
+
+  const onChangeBoardState = (cell) => {
+    const newBoardState = boardState.slice();
+    newBoardState[cell] = BoardConst.x;
+    setBoardState(newBoardState);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -24,22 +50,14 @@ const TicTacToe = () => {
       <Mainmenu />
 
       <IonContent fullscreen>
-        <div className="flex">
-          <div>
-            <div>1</div>
-            <div>2</div>
-            <div>3</div>
-          </div>
-          <div>
-            <div>4</div>
-            <div>5</div>
-            <div>6</div>
-          </div>
-          <div>
-            <div>7</div>
-            <div>8</div>
-            <div>9</div>
-          </div>
+        <Board
+          boardState={boardState}
+          onChangeBoardState={onChangeBoardState}
+        />
+        <div className="flex flex-col items-center">
+          <IonLabel color="secondary">Player 1: {0}</IonLabel>
+          <IonLabel color="secondary">Player 2: {0}</IonLabel>
+          <IonLabel color="secondary">Draw: {0}</IonLabel>
         </div>
       </IonContent>
     </IonPage>
