@@ -1,3 +1,4 @@
-import { BoardConst } from "./constants";
+import { BoardConst, MenuOptions, PlayerTurn, GameType } from "./constants";
+import { checkWinner } from "./gameFunctions";
 
-export { BoardConst };
+export { BoardConst, MenuOptions, PlayerTurn, GameType, checkWinner };

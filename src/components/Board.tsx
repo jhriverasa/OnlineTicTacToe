@@ -1,6 +1,6 @@
-import { BoardConst } from "../utils";
+import { BoardConst, checkWinner } from "../utils";
 
-const Board = ({ boardState, onChangeBoardState }) => {
+const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
   const handleClickGame = (cell) => {
     onChangeBoardState(cell);
   };
@@ -12,10 +12,23 @@ const Board = ({ boardState, onChangeBoardState }) => {
   };
 
   return (
-    <div className="flex flex-col w-full p-12 items-center">
+    <div
+      className={`flex flex-col w-full pt-12 items-center ${
+        isMyTurn() &&
+        !(
+          checkWinner(boardState) === BoardConst.o ||
+          checkWinner(boardState) === BoardConst.x ||
+          checkWinner(boardState) === BoardConst.draw
+        )
+          ? ""
+          : "pointer-events-none"
+      }`}
+    >
       <div className="flex">
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[0] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(0)}
         >
           <div>
@@ -23,7 +36,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[1] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(1)}
         >
           <div>
@@ -31,7 +46,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[2] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(2)}
         >
           <div>
@@ -41,7 +58,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
       </div>
       <div className="flex">
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[3] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(3)}
         >
           <div>
@@ -49,7 +68,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[4] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(4)}
         >
           <div>
@@ -57,7 +78,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[5] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(5)}
         >
           <div>
@@ -67,7 +90,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
       </div>
       <div className="flex">
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[6] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(6)}
         >
           <div>
@@ -75,7 +100,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[7] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(7)}
         >
           <div>
@@ -83,7 +110,9 @@ const Board = ({ boardState, onChangeBoardState }) => {
           </div>
         </div>
         <div
-          className="p-6 border border-white"
+          className={`p-6 border border-white ${
+            boardState[8] !== BoardConst.blank ? "pointer-events-none" : ""
+          }`}
           onClick={() => handleClickGame(8)}
         >
           <div>

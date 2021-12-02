@@ -15,7 +15,9 @@ import {
   earthOutline,
 } from "ionicons/icons";
 
-const MainMenu = () => {
+import { MenuOptions } from "../../utils";
+
+const MainMenu = ({ onClickOption }) => {
   return (
     <IonMenu
       side="start"
@@ -24,23 +26,43 @@ const MainMenu = () => {
       contentId="menuContent"
     >
       <IonList>
-        <IonItem className="ion-activatable">
-          <IonRippleEffect/>
+        <IonItem
+          className="ion-activatable"
+          onClick={() => {
+            onClickOption(MenuOptions.newGame);
+          }}
+        >
+          <IonRippleEffect />
           <IonIcon icon={diceOutline} slot="" />
-          <IonLabel className="px-4">New Game vs IA</IonLabel>
+          <IonLabel className="px-4">New Game vs AI</IonLabel>
         </IonItem>
-        <IonItem className="ion-activatable">
-          <IonRippleEffect/>
+        <IonItem
+          className="ion-activatable"
+          onClick={() => {
+            onClickOption(MenuOptions.hostGame);
+          }}
+        >
+          <IonRippleEffect />
           <IonIcon icon={desktopOutline} slot="" />
           <IonLabel className="px-4">Host a Game</IonLabel>
         </IonItem>
-        <IonItem className="ion-activatable">
-          <IonRippleEffect/>
+        <IonItem
+          className="ion-activatable"
+          onClick={() => {
+            onClickOption(MenuOptions.joinGame);
+          }}
+        >
+          <IonRippleEffect />
           <IonIcon icon={earthOutline} slot="" />
           <IonLabel className="px-4">Join Room</IonLabel>
         </IonItem>
-        <IonItem className="ion-activatable">
-          <IonRippleEffect/>
+        <IonItem
+          className="ion-activatable"
+          onClick={() => {
+            onClickOption(MenuOptions.about);
+          }}
+        >
+          <IonRippleEffect />
           <IonIcon icon={atOutline} slot="" />
           <IonLabel className="px-4">About</IonLabel>
         </IonItem>
