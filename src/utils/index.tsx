@@ -1,4 +1,15 @@
 import { BoardConst, MenuOptions, PlayerTurn, GameType } from "./constants";
-import { checkWinner } from "./gameFunctions";
+import { checkWinner, isBoardEqual } from "./gameFunctions";
+import { createRoom, joinRoom, playInOnlineRoom } from "./onlineServices";
 
-export { BoardConst, MenuOptions, PlayerTurn, GameType, checkWinner };
+export {
+  BoardConst,
+  MenuOptions,
+  PlayerTurn,
+  GameType,
+  isBoardEqual,
+  checkWinner,
+  createRoom,
+  joinRoom,
+  playInOnlineRoom,
+};

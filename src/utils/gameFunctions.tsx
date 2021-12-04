@@ -10,7 +10,7 @@ const checkWinner = (board) => {
     board[0] === board[1] &&
     board[1] === board[2]
   ) {
-    console.log("first row")
+    console.log("first row");
     winner = board[0];
   }
   if (
@@ -78,4 +78,10 @@ const checkWinner = (board) => {
   return winner;
 };
 
-export { checkWinner };
+const isBoardEqual = (b1, b2) => {
+  return b1.every((cur, index) => {
+    return cur === b2[index];
+  });
+};
+
+export { checkWinner, isBoardEqual };

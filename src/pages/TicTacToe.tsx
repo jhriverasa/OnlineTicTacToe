@@ -9,11 +9,15 @@ import {
   IonTitle,
   IonLabel,
   IonButton,
+  IonAlert,
+  AlertInput,
   IonRippleEffect,
   IonGrid,
   IonRow,
   IonCol,
 } from "@ionic/react";
+
+import { menuController } from "@ionic/core";
 
 import {
   BoardConst,
@@ -21,6 +25,11 @@ import {
   PlayerTurn,
   GameType,
   checkWinner,
+  isBoardEqual,
+  //onlineGameServices
+  createRoom,
+  joinRoom,
+  playInOnlineRoom,
 } from "../utils";
 
 import Board from "../components/Board";
@@ -34,10 +43,34 @@ const TicTacToe = () => {
   const [boardState, setBoardState] = useState(blankBoardState);
   const [score, setScore] = useState([0, 0, 0]); //p1,p2,draw
   const [turn, setTurn] = useState(PlayerTurn.one);
+  const [onlineIdRoom, setOnlineIdRoom] = useState("");
+
+  const [menuClickedOption, setMenuClickedOption] = useState(
+    MenuOptions.newGame
+  );
+  const [isRoomAlertOpen, setRoomAlertOpen] = useState(false);
 
   const OnClickMenuOption = (selectedOption) => {
+    setMenuClickedOption(selectedOption);
+
+    //New Game Selected
     if (selectedOption === MenuOptions.newGame) {
       setNewGame();
+      menuController.close();
+    }
+
+    //Host Game Selected
+    if (selectedOption === MenuOptions.hostGame) {
+      setRoomAlertOpen(true);
+      //Close menu so we can use the alert
+      menuController.close();
+    }
+
+    //Join Game Selected
+    if (selectedOption === MenuOptions.joinGame) {
+      setRoomAlertOpen(true);
+      //Close menu so we can use the alert
+      menuController.close();
     }
   };
 
@@ -60,34 +93,49 @@ const TicTacToe = () => {
 
   const onChangeBoardState = (cell) => {
     const newBoardState = boardState.slice();
-    newBoardState[cell] = BoardConst.x;
+    //Determine the kind of move X or O
+    const move =
+      gameType === GameType.ai || gameType === GameType.host
+        ? BoardConst.x
+        : BoardConst.o;
+
+    newBoardState[cell] = move;
     setBoardState(newBoardState);
     const newTurn = getPlayerTurn(newBoardState);
     setTurn(newTurn);
 
     //if playing vs AI get a new move and do it
-    // also update stats
-    if (newTurn === PlayerTurn.endGame) {
-      //update score
-      updateScore(newBoardState, score);
-    } else {
+    if (gameType === GameType.ai) {
       setTimeout(() => {
         moveAsAi(newBoardState);
       }, 1000);
+    }
+
+    if (gameType === GameType.host || gameType === GameType.join) {
+      const roomData = {
+        gameState: newBoardState,
+        score:
+          newTurn === PlayerTurn.endGame
+            ? updateScore(newBoardState, score)
+            : score,
+      };
+      console.log(newBoardState);
+      playInOnlineRoom(onlineIdRoom, roomData);
     }
   };
 
   const getPlayerTurn = (board) => {
     //if Someone won end the game
+    const possibleWinner = checkWinner(board);
     if (
-      checkWinner(board) === BoardConst.o ||
-      checkWinner(board) === BoardConst.x ||
-      checkWinner(board) === BoardConst.draw
+      possibleWinner === BoardConst.o ||
+      possibleWinner === BoardConst.x ||
+      possibleWinner === BoardConst.draw
     ) {
       return PlayerTurn.endGame;
     }
 
-    if (gameType === GameType.ai) {
+    if (true) {
       //Get num of plays for each player
       const nPOnePlays = board.reduce((total, curr) => {
         return total + (curr === BoardConst.x ? 1 : 0);
@@ -128,24 +176,129 @@ const TicTacToe = () => {
   const setNewGame = () => {
     setBoardState(blankBoardState);
     setTurn(PlayerTurn.one);
+    setGameType(GameType.ai);
+  };
+
+  const hostNewGame = async (pass) => {
+    //Conditions on pass
+
+    if (pass !== "") {
+      setBoardState(blankBoardState);
+      setTurn(PlayerTurn.waitingForPlayer);
+      setGameType(GameType.host);
+
+      const id = await createRoom(pass, onChangeOnlineBoard);
+      setOnlineIdRoom(id);
+    } else {
+      console.log("error creating the game");
+    }
+  };
+
+  const joinToGame = async (pass) => {
+    //conditions on pass
+
+    if (pass !== "") {
+      setBoardState(blankBoardState);
+      setTurn(PlayerTurn.one);
+      setGameType(GameType.join);
+      const id = await joinRoom(pass, onChangeOnlineBoard);
+      setOnlineIdRoom(id);
+    } else {
+      console.log("error joining to a game");
+    }
+  };
+
+  const onChangeOnlineBoard = (data) => {
+    const roomData = data;
+    const onlineGameState = Object.values(roomData.gameState);
+
+    // a player joined to game
+    if (
+      menuClickedOption === MenuOptions.hostGame &&
+      !roomData.waitingForPlayer &&
+      isBoardEqual(onlineGameState, blankBoardState)
+    ) {
+      setTurn(PlayerTurn.one);
+      console.log("un jugador se unio a tu partida");
+      return 0; //stop
+    }
+
+    // Is my turn as a joined player?
+    if (
+      menuClickedOption === MenuOptions.joinGame &&
+      getPlayerTurn(onlineGameState) === PlayerTurn.two &&
+      !isBoardEqual(onlineGameState, blankBoardState)
+    ) {
+      if (Array.isArray(onlineGameState)) setBoardState(onlineGameState); //avoid warnings ts
+      setTurn(PlayerTurn.two);
+      console.log("Juega P2");
+    }
+
+    // Is my turn as a host player?
+    if (
+      menuClickedOption === MenuOptions.hostGame &&
+      !roomData.waitingForPlayer &&
+      getPlayerTurn(onlineGameState) === PlayerTurn.one
+    ) {
+      if (Array.isArray(onlineGameState)) setBoardState(onlineGameState); //avoid warnings ts
+      setTurn(PlayerTurn.one);
+      console.log("Juega P1");
+    }
+
+    // game has ended?
+    if (
+      (menuClickedOption === MenuOptions.hostGame ||
+        menuClickedOption === MenuOptions.joinGame) &&
+      getPlayerTurn(onlineGameState) === PlayerTurn.endGame
+    ) {
+      if (Array.isArray(onlineGameState)) setBoardState(onlineGameState); //avoid warnings ts
+      setTurn(PlayerTurn.endGame);
+      setScore(roomData.score);
+      console.log("Finalizado");
+    }
   };
 
   const updateScore = (board, lastScore) => {
     const result = checkWinner(board);
-    console.log(result);
+    let newScore;
+
     if (result === BoardConst.x) {
-      setScore([lastScore[0] + 1, lastScore[1], lastScore[2]]);
+      newScore = [lastScore[0] + 1, lastScore[1], lastScore[2]];
     }
     if (result === BoardConst.o) {
-      setScore([lastScore[0], lastScore[1] + 1, lastScore[2]]);
+      newScore = [lastScore[0], lastScore[1] + 1, lastScore[2]];
     }
     if (result === BoardConst.draw) {
-      setScore([lastScore[0], lastScore[1], lastScore[2] + 1]);
+      newScore = [lastScore[0], lastScore[1], lastScore[2] + 1];
     }
+    setScore(newScore);
+    return newScore;
   };
 
   const resetScore = () => {
     setScore([0, 0, 0]);
+  };
+
+  const renderStateMessage = () => {
+    if (gameType === GameType.ai) {
+      if (turn === PlayerTurn.one) return "Your Turn!";
+      if (turn === PlayerTurn.two) return "Player Two turn!";
+      if (turn === PlayerTurn.endGame) return "END!";
+    }
+    if (gameType === GameType.host) {
+      if (turn === PlayerTurn.waitingForPlayer)
+        return "Waiting for a player...";
+      if (turn === PlayerTurn.one) return "Your Turn!";
+      if (turn === PlayerTurn.two) return "Player Two turn!";
+      if (turn === PlayerTurn.endGame) return "END!";
+    }
+    if (gameType === GameType.join) {
+      if (turn === PlayerTurn.waitingForPlayer) return "joining to a game...";
+      if (turn === PlayerTurn.one) return "Player One turn!";
+      if (turn === PlayerTurn.two) return "Your turn!";
+      if (turn === PlayerTurn.endGame) return "END!";
+    }
+    return "error";
   };
 
   return (
@@ -153,12 +306,57 @@ const TicTacToe = () => {
       <IonHeader>
         <IonToolbar>
           <IonMenuButton slot="start" menu="main" />
-          <IonTitle size="large">Tic-Tac-Toe</IonTitle>
+          <IonTitle size="large">{`Tic-Tac-Toe ${
+            gameType === GameType.host || gameType === GameType.join
+              ? "- Online"
+              : ""
+          } `}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <Mainmenu onClickOption={OnClickMenuOption} />
 
       <IonContent fullscreen>
+        <IonAlert
+          isOpen={isRoomAlertOpen}
+          onDidDismiss={() => {}}
+          header={`${
+            menuClickedOption === MenuOptions.hostGame ? "Create" : "Join"
+          } Room`}
+          inputs={[
+            {
+              name: "pass",
+              type: "text",
+              id: "pass",
+              value: "",
+              placeholder: "Room Pass",
+              handler: () => {},
+              attributes: {
+                onChange: () => {},
+              },
+            },
+          ]}
+          buttons={[
+            {
+              text: "Cancel",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: () => {
+                // OnClickMenuOption(MenuOptions.newGame);
+                setRoomAlertOpen(false);
+              },
+            },
+            {
+              text: "Ok",
+              handler: (data) => {
+                const pass = data.pass;
+                if (menuClickedOption === MenuOptions.hostGame)
+                  hostNewGame(pass);
+                if (menuClickedOption === MenuOptions.joinGame)
+                  joinToGame(pass);
+              },
+            },
+          ]}
+        />
         <Board
           boardState={boardState}
           isMyTurn={isMyTurn}
@@ -166,9 +364,7 @@ const TicTacToe = () => {
         />
         <div className="flex flex-col items-center my-3">
           <IonLabel color="danger" className="py-2">
-            {turn === PlayerTurn.one && "Your Turn!"}
-            {turn === PlayerTurn.two && "Player Two turn!"}
-            {turn === PlayerTurn.endGame && "END!"}
+            {renderStateMessage()}
           </IonLabel>
           <IonLabel color="secondary">Player 1: {score[0]}</IonLabel>
           <IonLabel color="secondary">Player 2: {score[1]}</IonLabel>
