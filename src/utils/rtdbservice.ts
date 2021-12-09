@@ -6,7 +6,7 @@ import { getDatabase } from "firebase/database";
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
   authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASE_URLX,
+  databaseURL: process.env.DATABASE_X,
   storageBucket: process.env.STORAGE_BUCKET,
 };
 

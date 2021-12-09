@@ -26,7 +26,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
     >
       <div className="flex">
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[0] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(0)}
@@ -36,7 +36,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[1] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(1)}
@@ -46,7 +46,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[2] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(2)}
@@ -58,7 +58,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
       </div>
       <div className="flex">
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[3] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(3)}
@@ -68,7 +68,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[4] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(4)}
@@ -78,7 +78,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[5] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(5)}
@@ -90,7 +90,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
       </div>
       <div className="flex">
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[6] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(6)}
@@ -100,7 +100,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[7] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(7)}
@@ -110,7 +110,7 @@ const Board = ({ boardState, onChangeBoardState, isMyTurn }) => {
           </div>
         </div>
         <div
-          className={`p-6 border border-white ${
+          className={`p-6 border border-black ${
             boardState[8] !== BoardConst.blank ? "pointer-events-none" : ""
           }`}
           onClick={() => handleClickGame(8)}

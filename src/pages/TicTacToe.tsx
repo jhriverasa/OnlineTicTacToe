@@ -10,6 +10,7 @@ import {
   IonLabel,
   IonButton,
   IonAlert,
+  IonModal,
   AlertInput,
   IonRippleEffect,
   IonGrid,
@@ -49,6 +50,7 @@ const TicTacToe = () => {
     MenuOptions.newGame
   );
   const [isRoomAlertOpen, setRoomAlertOpen] = useState(false);
+  const [isAboutModalOpen, setAboutModalOpen] = useState(false);
 
   const OnClickMenuOption = (selectedOption) => {
     setMenuClickedOption(selectedOption);
@@ -72,6 +74,11 @@ const TicTacToe = () => {
       //Close menu so we can use the alert
       menuController.close();
     }
+
+    //About Selected
+    if (selectedOption === MenuOptions.about) {
+      setAboutModalOpen(true);
+    }
   };
 
   const moveAsAi = (board) => {
@@ -82,8 +89,9 @@ const TicTacToe = () => {
     });
 
     newBoardState[index] = BoardConst.o;
-    setBoardState(newBoardState);
     const newTurn = getPlayerTurn(newBoardState);
+    setBoardState(newBoardState);
+
     setTurn(newTurn);
     if (newTurn === PlayerTurn.endGame) {
       //update score
@@ -106,9 +114,13 @@ const TicTacToe = () => {
 
     //if playing vs AI get a new move and do it
     if (gameType === GameType.ai) {
-      setTimeout(() => {
-        moveAsAi(newBoardState);
-      }, 1000);
+      if (newTurn !== PlayerTurn.endGame) {
+        setTimeout(() => {
+          moveAsAi(newBoardState);
+        }, 1000);
+      } else {
+        updateScore(newBoardState, score);
+      }
     }
 
     if (gameType === GameType.host || gameType === GameType.join) {
@@ -208,9 +220,34 @@ const TicTacToe = () => {
     }
   };
 
+  const playNewOnlineGame = async () => {
+    if (onlineIdRoom !== "") {
+      setBoardState(blankBoardState);
+      setTurn(PlayerTurn.one);
+      //setGameType(GameType.join);
+      playInOnlineRoom(onlineIdRoom, { gameState: blankBoardState });
+    } else {
+      console.log("error creating a new online game");
+    }
+  };
+
   const onChangeOnlineBoard = (data) => {
     const roomData = data;
     const onlineGameState = Object.values(roomData.gameState);
+    // a new game
+    console.log(gameType);
+    if (
+      (menuClickedOption === MenuOptions.hostGame ||
+        menuClickedOption === MenuOptions.joinGame) &&
+      !roomData.waitingForPlayer &&
+      isBoardEqual(onlineGameState, blankBoardState) &&
+      !isBoardEqual(Object.values(roomData.score), [0, 0, 0]) // comparing arrays
+    ) {
+      setTurn(PlayerTurn.one);
+      setBoardState(blankBoardState);//update to the player who didint push new game button
+      console.log("Nuevo juego");
+      return 0; //stop
+    }
 
     // a player joined to game
     if (
@@ -283,20 +320,24 @@ const TicTacToe = () => {
     if (gameType === GameType.ai) {
       if (turn === PlayerTurn.one) return "Your Turn!";
       if (turn === PlayerTurn.two) return "Player Two turn!";
-      if (turn === PlayerTurn.endGame) return "END!";
     }
     if (gameType === GameType.host) {
       if (turn === PlayerTurn.waitingForPlayer)
         return "Waiting for a player...";
       if (turn === PlayerTurn.one) return "Your Turn!";
       if (turn === PlayerTurn.two) return "Player Two turn!";
-      if (turn === PlayerTurn.endGame) return "END!";
     }
     if (gameType === GameType.join) {
       if (turn === PlayerTurn.waitingForPlayer) return "joining to a game...";
       if (turn === PlayerTurn.one) return "Player One turn!";
       if (turn === PlayerTurn.two) return "Your turn!";
-      if (turn === PlayerTurn.endGame) return "END!";
+    }
+
+    const possibleWinner = checkWinner(boardState);
+    if (turn === PlayerTurn.endGame) {
+      if (possibleWinner === BoardConst.x) return "Player One Won!";
+      if (possibleWinner === BoardConst.o) return "Player Two Won!";
+      if (possibleWinner === BoardConst.draw) return "Draw!";
     }
     return "error";
   };
@@ -357,6 +398,23 @@ const TicTacToe = () => {
             },
           ]}
         />
+        <IonModal
+          isOpen={isAboutModalOpen}
+          onDidDismiss={() => {
+            setAboutModalOpen(false);
+          }}
+        >
+          <div className="flex flex-col justify-center items-center h-full">
+            <IonLabel color="secondary">Tic-Tac-Toe Online version</IonLabel>
+            <IonLabel color="secondary">
+              Reto 6 - Jhonatan Rivera Saumeth
+            </IonLabel>
+            <div className="my-3">
+              <img src="./assets/icon/tictactoe.png" />
+            </div>
+          </div>
+          <IonButton onClick={() => setAboutModalOpen(false)}>Close</IonButton>
+        </IonModal>
         <Board
           boardState={boardState}
           isMyTurn={isMyTurn}
@@ -369,13 +427,30 @@ const TicTacToe = () => {
           <IonLabel color="secondary">Player 1: {score[0]}</IonLabel>
           <IonLabel color="secondary">Player 2: {score[1]}</IonLabel>
           <IonLabel color="secondary">Draw: {score[2]}</IonLabel>
+
+          {(gameType === GameType.ai || onlineIdRoom === "") && (
+            <IonButton
+              expand="block"
+              fill="outline"
+              className="my-3"
+              onClick={resetScore}
+            >
+              Reset Scores
+            </IonButton>
+          )}
           <IonButton
             expand="block"
             fill="outline"
-            className="my-3"
-            onClick={resetScore}
+            className={`my-3 ${
+              (menuClickedOption === MenuOptions.hostGame ||
+                menuClickedOption === MenuOptions.joinGame) &&
+              onlineIdRoom !== ""
+                ? ""
+                : "invisible"
+            }`}
+            onClick={playNewOnlineGame}
           >
-            Reset Scores
+            Play New Game
           </IonButton>
         </div>
       </IonContent>
